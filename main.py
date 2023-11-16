@@ -11,27 +11,22 @@ from ultralytics import YOLO
 if __name__ == "__main__":
     face_model = load_face_detection_model()
     landmark_model = load_landmark_model()
-    left = [36, 37, 38, 39, 40, 41]
-    right = [42, 43, 44, 45, 46, 47]
-    model = YOLO('phones.pt')
-    model2 = YOLO('hands.pt')
+    left_eye_landmarks = [36, 37, 38, 39, 40, 41]
+    right_eye_landmarks = [42, 43, 44, 45, 46, 47]
+    phone_detection_model = YOLO('phones.pt')
+    hands_detection_model = YOLO('hands.pt')
+
     cap = cv.VideoCapture(0)
     ret, img = cap.read()
     thresh = img.copy()
     size = img.shape
     font = cv.FONT_HERSHEY_SIMPLEX
-    # 3D phone_detection_model points.
-    model_points = np.array([
-        (0.0, 0.0, 0.0),  # Nose tip
-        (0.0, -330.0, -65.0),  # Chin
-        (-225.0, 170.0, -135.0),  # Left eye left_eye_landmarks corner
-        (225.0, 170.0, -135.0),  # Right eye right_eye_landmarks corner
-        (-150.0, -150.0, -125.0),  # Left Mouth corner
-        (150.0, -150.0, -125.0)  # Right mouth corner
-    ])
+
+    model_points = np.array([(0.0, 0.0, 0.0), (0.0, -330.0, -65.0), (-225.0, 170.0, -135.0),
+                            (225.0, 170.0, -135.0), (-150.0, -150.0, -125.0), (150.0, -150.0, -125.0)])
     cv.namedWindow('image')
     kernel = np.ones((9, 9), np.uint8)
-    # Camera internals
+
     focal_length = size[1]
     center = (size[1] / 2, size[0] / 2)
     camera_matrix = np.array(
@@ -45,18 +40,12 @@ if __name__ == "__main__":
         yolo = img.copy()
         eyes_img = img.copy()
 
-        if ret == True:
+        if ret:
             faces = detect_faces_in_image(img, face_model)
             for face in faces:
                 marks = detect_landmarks(img, landmark_model, face)
-                image_points = np.array([
-                    marks[30],
-                    marks[8],
-                    marks[36],
-                    marks[45],
-                    marks[48],
-                    marks[54]
-                ], dtype="double")
+                image_points = np.array([marks[30], marks[8], marks[36],
+                                                marks[45], marks[48], marks[54]], dtype="double")
                 dist_coeffs = np.zeros((4, 1))
                 (success, rotation_vector, translation_vector) = cv.solvePnP(model_points, image_points, camera_matrix,
                                                                               dist_coeffs, flags=cv.SOLVEPNP_UPNP)
@@ -109,8 +98,8 @@ if __name__ == "__main__":
             for rect in rects:
                 shape = detect_landmarks(eyes_img, landmark_model, rect)
                 mask = np.zeros(eyes_img.shape[:2], dtype=np.uint8)
-                mask, end_points_left = create_eye_mask(mask, left, shape)
-                mask, end_points_right = create_eye_mask(mask, right, shape)
+                mask, end_points_left = create_eye_mask(mask, left_eye_landmarks, shape)
+                mask, end_points_right = create_eye_mask(mask, right_eye_landmarks, shape)
                 mask = cv.dilate(mask, kernel, 5)
 
                 eyes = cv.bitwise_and(eyes_img, eyes_img, mask=mask)
@@ -128,15 +117,17 @@ if __name__ == "__main__":
 
             cv.imshow('eyes', eyes_img)
 
-            results = model(yolo, verbose=False)
+            results = phone_detection_model(yolo, verbose=False)
             print("Phone detected") if len(results[0].boxes.cls) > 0 else None
             annotated_frame = results[0].plot()
             cv.imshow("YOLOv8 Inference2", annotated_frame)
 
-            results2 = model2(yolo, verbose=False)
+            results2 = hands_detection_model(yolo, verbose=False)
             annotated_frame2 = results2[0].plot()
             cv.imshow("YOLOv8 Inference", annotated_frame2)
-            print("Hands not on wheel") if (len(results2[0].boxes.cls.tolist()) > 0 and 3. not in results2[0].boxes.cls.tolist()) or len(results2[0].boxes.cls.tolist()) == 0 else None
+            print("Hands not on wheel") if ((len(results2[0].boxes.cls.tolist()) > 0
+                                            and 3. not in results2[0].boxes.cls.tolist())
+                                            or len(results2[0].boxes.cls.tolist()) == 0) else None
 
             if cv.waitKey(1) & 0xFF == ord('q'):
                 break
