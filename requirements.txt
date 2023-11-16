@@ -1,0 +1,4 @@
+opencv-python~=4.8.1    # License: Apache Software
+numpy~=1.23.5           # License: BSD
+tensorflow~=2.14.0      # License: Apache Software
+ultralytics~=8.0.196    # License: GNU Affero General Public License v3 or later (AGPLv3+)
