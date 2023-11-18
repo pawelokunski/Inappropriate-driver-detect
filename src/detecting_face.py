@@ -3,8 +3,8 @@ import numpy as np
 
 
 def load_face_detection_model():
-    model_file = "models/res10_300x300_ssd_iter_140000.caffemodel"
-    config_file = "models/deploy.txt"
+    model_file = "models/detect/res10_300x300_ssd_iter_140000.caffemodel"
+    config_file = "models/detect/deploy.txt"
     face_model = cv.dnn.readNetFromCaffe(config_file, model_file)
     return face_model
 

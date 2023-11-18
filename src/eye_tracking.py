@@ -54,11 +54,11 @@ def display_eye_position(image, left_position, right_position):
     if left_position == right_position and left_position != 0:
         text = ''
         if left_position == 1:
-            print('Looking left_eye_landmarks')
-            text = 'Looking left_eye_landmarks'
+            print('Looking left')
+            text = 'Looking left'
         elif left_position == 2:
-            print('Looking right_eye_landmarks')
-            text = 'Looking right_eye_landmarks'
+            print('Looking right')
+            text = 'Looking right'
         elif left_position == 3:
             print('Looking up')
             text = 'Looking up'

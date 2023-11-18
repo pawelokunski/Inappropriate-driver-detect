@@ -13,8 +13,8 @@ if __name__ == "__main__":
     landmark_model = load_landmark_model()
     left_eye_landmarks = [36, 37, 38, 39, 40, 41]
     right_eye_landmarks = [42, 43, 44, 45, 46, 47]
-    phone_detection_model = YOLO('phones.pt')
-    hands_detection_model = YOLO('hands.pt')
+    phone_detection_model = YOLO('models/phones.pt')
+    hands_detection_model = YOLO('models/hands.pt')
 
     cap = cv.VideoCapture(0)
     ret, img = cap.read()
@@ -82,11 +82,11 @@ if __name__ == "__main__":
                     cv.putText(img, 'Head up', (30, 30), font, 2, (255, 255, 128), 3)
 
                 if ang2 >= 48:
-                    print('Head right_eye_landmarks')
-                    cv.putText(img, 'Head right_eye_landmarks', (90, 30), font, 2, (255, 255, 128), 3)
+                    print('Head right')
+                    cv.putText(img, 'Head right', (90, 30), font, 2, (255, 255, 128), 3)
                 elif ang2 <= -48:
-                    print('Head left_eye_landmarks')
-                    cv.putText(img, 'Head left_eye_landmarks', (90, 30), font, 2, (255, 255, 128), 3)
+                    print('Head left')
+                    cv.putText(img, 'Head left', (90, 30), font, 2, (255, 255, 128), 3)
 
                 cv.putText(img, str(ang1), tuple(p1), font, 2, (128, 255, 255), 3)
                 cv.putText(img, str(ang2), tuple(x1), font, 2, (255, 255, 128), 3)
